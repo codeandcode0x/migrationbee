@@ -27,7 +27,7 @@ Drivers:
 
 Examples:
 
-    migbee mysql --url "mysql://root:coding123@mysql:3306/dbname" --path source_folders --service mariadb --namespace ns
+    migbee mysql --url "mysql://user:passwd@mysql:3306/dbname" --path source_folders --service mariadb --namespace ns
 
 Options:
   -h  print help
@@ -40,8 +40,6 @@ Commands:
     status               Dump the migration status for the current DB
     version              Print the current version of the database
 ```
-
-
 
 
 ## License

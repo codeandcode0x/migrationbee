@@ -90,6 +90,20 @@ func GenerateDependTreeByConfig(resoucesRoot string, runSvcs []string) []map[str
 	return layerNodes
 }
 
+
+func GenerateDependTreeAll(resoucesRoot string) []map[string]*ResNode {
+	//app list
+	resourceMap := make(map[string]Resource, 0)
+	resNodeMap := make(map[string]*ResNode, 0)
+	runNodeMap := make(map[string]*ResNode, 0)
+	currentNodes := []*ResNode{}
+	allNodes := []LayerNode{}
+	//generate node tree
+	getAllResourcesFromRoot(resoucesRoot, resourceMap, resNodeMap)
+	ResourceTreePrint(currentNodes, runNodeMap, &allNodes)
+	return []map[string]*ResNode{resNodeMap}
+}
+
 //generate depend tree
 func GenerateDependTree(resoucesRoot, appName string) []map[string]*ResNode {
 	//app list
@@ -112,7 +126,7 @@ func GenerateDependTree(resoucesRoot, appName string) []map[string]*ResNode {
 	ResourceTreePrint(currentNodes, runNodeMap, &allNodes)
 	layerNodes := removeDuplicateNode(allNodes)
 	//write data init status file
-	WriteDataStatusFile(sqlFileMap, false)
+	// WriteDataStatusFile(sqlFileMap, false)
 	//print tree
 	// PrintlnRes(layerNodes)
 	//return
@@ -422,7 +436,7 @@ func GetResourceYaml(filePath string) []byte {
 //tools
 func ResourcePrint(res map[string]*ResNode) {
 	for _, v := range res {
-		fmt.Println(v.Id, v.ParentId, v.Name, v.Parent)
+		fmt.Println(v.Id, v.ParentId, v.Name, v.Parent, v.DataInitPath)
 	}
 }
 

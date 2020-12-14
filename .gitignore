@@ -17,3 +17,4 @@
 backup
 test
 logs/*
+.DS_Store

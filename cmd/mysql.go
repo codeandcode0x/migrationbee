@@ -7,7 +7,7 @@ import (
 )
 
 
-var dbUrl, filePath, srcName, nameSpace string
+var dbUrl, filePath, srcName, nameSpace, apps string
 
 //init
 func init() {
@@ -16,6 +16,7 @@ func init() {
     migrationCmd.Flags().StringVarP(&filePath, "path", "p", "", "Location of sql file")
     migrationCmd.Flags().StringVarP(&srcName, "service", "s", "", "K8s service name")
     migrationCmd.Flags().StringVarP(&nameSpace, "namespace", "n", "", "K8s namespace")
+    migrationCmd.Flags().StringVarP(&apps, "apps", "a", "all", "applications")
     rootCmd.AddCommand(migrationCmd)
 }
 
@@ -27,7 +28,7 @@ var migrationCmd = &cobra.Command{
     Run: func(cmd *cobra.Command, args []string) {
         //TO-DO
         log.Println("welcome to use migbee to migrate data")
-        migration.DeployResourceByLayNodes("all", "true", "MYSQL", dbUrl, filePath, srcName, nameSpace)
+        migration.DeployResourceByLayNodes(apps, "true", "MYSQL", dbUrl, filePath, srcName, nameSpace)
     },
 }
 

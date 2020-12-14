@@ -5,8 +5,7 @@ package src
 * data: 2020/05/01
 
 * describe:
-* two ways to deploy apps: one apply simple app/service root fold
-* other one deploy form config app run list, run like this:
+* migrate data to k8s container, , run like this:
 *
 * ~ run apps: # cli [run]
 *
@@ -83,7 +82,7 @@ func init() {
 		panic(err)
 	}
 	//init config
-	initConfig()
+	// initConfig()
 	log.SetFlags(0)
 }
 
@@ -103,12 +102,12 @@ func initConfig() {
 		}
 	}
 	//set env ns
-	os.Setenv("NAMESPACE", appConfig.Namespace)
-	namespace = appConfig.Namespace
+	// os.Setenv("NAMESPACE", appConfig.Namespace)
+	// namespace = appConfig.Namespace
 	//set db src name
 	// dbSrcName = appConfig.Dbsrcname
 	//set resource root
-	servicePath = appConfig.Servicepath
+	// servicePath = appConfig.Servicepath
 	//set no check apps
 	for _,v := range appConfig.Nocheck {
 		noCheckNodes[v] = v
@@ -125,15 +124,18 @@ func initConfig() {
 
 //get all resource files
 func DeployResourceByLayNodes(app, strictModel, dbType, dbUrl, filePath, srcName, ns string) error {
+	//init config 
+	servicePath = filePath
+	namespace = ns
+	//deploy resource
 	var layNodes []map[string]*ResNode
 	if app == "all" {
-		layNodes = GenerateDependTreeByConfig(servicePath, apps)
+		layNodes = GenerateDependTreeAll(servicePath)
 	}else{
 		layNodes = GenerateDependTree(servicePath, app)	
 	}
-
 	//read data init file
-	getDataInitFile()
+	getDataInitFile(layNodes)
 	//set strict model
 	if strictModel == "false" || strictModel == "debug" { //false
 		layNodes = layNodes[:1]
@@ -145,7 +147,6 @@ func DeployResourceByLayNodes(app, strictModel, dbType, dbUrl, filePath, srcName
 		for _,apps := range layNodes {
 			podReset(apps)
 		}
-		WriteDataStatusFile(dataInitFileMap, true)
 		return nil
 	}
 
@@ -161,8 +162,6 @@ func DeployResourceByLayNodes(app, strictModel, dbType, dbUrl, filePath, srcName
     	}
     	wg.Wait()
     }
-    //save data status
-    WriteDataStatusFile(dataInitFileMap, true)
     return nil
 }
 
@@ -290,10 +289,15 @@ func initPodData(dataType string, namespace, path, padName, containerName, dbUse
 }
 
 //get data init file map
-func getDataInitFile() {
+func getDataInitFile(layNodes []map[string]*ResNode) {
 	dataInitFileMap = make(map[string]string, 0)
-	dataBytes := ReadDataFile("./run/data-init-status.json")
-	json.Unmarshal(dataBytes, &dataInitFileMap)
+	for i:=len(layNodes)-1; i>=0 ; i-- {
+		for _, resNode := range layNodes[i] {
+			for i:=len(resNode.DataInitPath)-1 ;i>=0;i-- {
+				dataInitFileMap[resNode.DataInitPath[i]] = "false"
+			}
+		}
+    }
 }
 
 //check pod status
@@ -590,7 +594,6 @@ func scanResFile(pathName string) {
 		}
 	 }
 }
-
 
 //resource delete
 func resDelete(resourceType string, bytes []byte) {
