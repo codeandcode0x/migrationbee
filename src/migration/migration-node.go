@@ -1,8 +1,8 @@
 package src
 /**
-* author: ethanluo
-* email: luocheng1@coding.net
-* data: 2020/10/23
+* author: codeandcodex01
+* email: codeandcodex@gmail.com
+* data: 2020/05/01
 * describe:
 
 * generate node data trees :
